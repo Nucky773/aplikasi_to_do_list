@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="id">
+ <head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260714-23-4d5d8ed"}');</script><script src="/_sdk/f432b76fb310b513.telemetry_sdk.js" integrity="sha512-9FJQ55EKmmqhyyik8BhrMVfm0+iYYfb8uOlRsjtkxJMEI97qOVEI4PnHohDjQAtvAep0IOEpdQ64eki0sz62ug=="></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My To-Do List</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+        body { font-family: 'DM Sans', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .slide-in { animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        .toast-in { animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes toastOut { to { opacity: 0; transform: translateY(20px); } }
+        .btn-hover { transition: all 0.3s ease; }
+        .btn-hover:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .progress-bar { transition: width 0.5s ease; }
+    </style>
+  <script src="/_sdk/9432170dbd2ae0df.resizing_sdk.js" type="text/javascript" integrity="sha512-FeT+58sb1f9ejWPWFjCbJvTT+SDwGV+ngrHUnlO7TWEOoqwOLj6p256kO3vOL7DIWl1cIgrobiof8v2bOigwPg=="></script>
+ </head>
+ <body data-template-id="__page-root" class="min-h-screen p-4 md:p-8">
+  <div class="max-w-3xl mx-auto fade-in"><!-- Header -->
+   <header class="text-center mb-6">
+    <h1 data-template-id="app-title" class="canva-text text-3xl font-bold text-white mb-1"></h1>
+    <p id="clock" class="text-white/80 text-sm"></p>
+   </header><!-- Stats -->
+   <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    <div data-template-id="stat-total" class="canva-card rounded-2xl p-4 text-center">
+     <p class="text-2xl font-bold" id="stat-total-val">0</p>
+     <p data-template-id="stat-total-label" class="canva-text text-xs mt-1"></p>
+    </div>
+    <div data-template-id="stat-done" class="canva-card rounded-2xl p-4 text-center">
+     <p class="text-2xl font-bold text-green-600" id="stat-done-val">0</p>
+     <p data-template-id="stat-done-label" class="canva-text text-xs mt-1"></p>
+    </div>
+    <div data-template-id="stat-pending" class="canva-card rounded-2xl p-4 text-center">
+     <p class="text-2xl font-bold text-orange-500" id="stat-pending-val">0</p>
+     <p data-template-id="stat-pending-label" class="canva-text text-xs mt-1"></p>
+    </div>
+    <div data-template-id="stat-progress" class="canva-card rounded-2xl p-4 text-center">
+     <p class="text-2xl font-bold text-purple-600" id="stat-progress-val">0%</p>
+     <p data-template-id="stat-progress-label" class="canva-text text-xs mt-1"></p>
+    </div>
+   </div><!-- Progress Bar -->
+   <div class="w-full bg-white/30 rounded-full h-2 mb-6">
+    <div id="progress-bar" class="progress-bar h-2 rounded-full bg-white" style="width:0%"></div>
+   </div><!-- Main Card -->
+   <div class="bg-white rounded-[20px] shadow-xl p-5 md:p-8"><!-- Add Form -->
+    <form id="task-form" class="mb-5 space-y-3">
+     <div class="flex gap-2"><input id="task-input" type="text" placeholder="Tambah tugas baru..." class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" required> <button data-template-id="add-btn" type="submit" class="canva-button btn-hover px-4 py-2.5 rounded-xl text-white text-sm font-semibold flex items-center gap-1"> <i data-lucide="plus" style="width:16px;height:16px"></i> <span>Tambah</span> </button>
+     </div>
+     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2"><select id="task-priority" class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"> <option value="medium">Sedang</option> <option value="high">Tinggi</option> <option value="low">Rendah</option> </select> <input id="task-deadline" type="date" class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"> <input id="task-category" type="text" placeholder="Kategori" class="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+     </div>
+    </form><!-- Search & Filters -->
+    <div class="mb-4 space-y-3"><input id="search-input" type="text" placeholder="Cari tugas..." class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+     <div class="flex flex-wrap gap-2"><button class="filter-btn active px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white" data-filter="all">Semua</button> <button class="filter-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600" data-filter="pending">Belum Selesai</button> <button class="filter-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600" data-filter="done">Sudah Selesai</button> <button class="filter-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600" data-filter="high">Prioritas Tinggi</button>
+     </div>
+    </div><!-- Task List -->
+    <div id="task-list" class="space-y-2 max-h-[400px] overflow-y-auto"></div><!-- Delete All -->
+    <div class="mt-4 flex justify-end" id="delete-all-wrap"><button id="delete-all-btn" type="button" class="btn-hover px-3 py-2 rounded-xl text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 transition"> <i data-lucide="trash-2" style="width:14px;height:14px;display:inline"></i> Hapus Semua </button>
+    </div>
+    <div class="mt-4 hidden flex justify-end gap-2" id="delete-all-confirm"><span class="text-xs text-red-600 self-center mr-2">Yakin hapus semua?</span> <button id="confirm-yes" type="button" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-600 text-white">Ya</button> <button id="confirm-no" type="button" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-200 text-gray-700">Batal</button>
+    </div>
+   </div>
+  </div><!-- Toast -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+  <script src="/_sdk/719055fef2a85d14.editing_sdk.js" integrity="sha512-kFqrdGgIiTOsu307feB5Cy3JVP9IayftsmCIZ0csxYBGuBmJQPhyvcnmKR8F0fTW97h5s1gAvz3SumI8zJ6OxQ=="></script>
+  <script src="/_sdk/0179d719c431a79e.data_sdk.js" integrity="sha512-OsRvJkI5GkC3MJQcgotQYotpzrMSX415GiKKgvYdxQEEkzD/fdchShO2FMSy0PJr/tiINMXOk5Vl2zAgg6bUiA=="></script>
+  <script>
+        let allTasks = [];
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let editingId = null;
+
+        // Clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' • ' + now.toLocaleTimeString('id-ID');
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Toast
+        function showToast(msg, type = 'success') {
+            const colors = { success: 'bg-green-500', error: 'bg-red-500', info: 'bg-blue-500' };
+            const el = document.createElement('div');
+            el.className = `toast-in ${colors[type]} text-white px-4 py-2.5 rounded-xl text-sm shadow-lg`;
+            el.textContent = msg;
+            document.getElementById('toast-container').appendChild(el);
+            setTimeout(() => el.remove(), 3000);
+        }
+
+        // Stats
+        function updateStats() {
+            const total = allTasks.length;
+            const done = allTasks.filter(t => t.completed).length;
+            const pending = total - done;
+            const progress = total ? Math.round((done / total) * 100) : 0;
+            document.getElementById('stat-total-val').textContent = total;
+            document.getElementById('stat-done-val').textContent = done;
+            document.getElementById('stat-pending-val').textContent = pending;
+            document.getElementById('stat-progress-val').textContent = progress + '%';
+            document.getElementById('progress-bar').style.width = progress + '%';
+        }
+
+        // Render
+        function getFiltered() {
+            let tasks = allTasks;
+            if (searchQuery) tasks = tasks.filter(t => t.title.toLowerCase().includes(searchQuery.toLowerCase()));
+            if (currentFilter === 'pending') tasks = tasks.filter(t => !t.completed);
+            else if (currentFilter === 'done') tasks = tasks.filter(t => t.completed);
+            else if (currentFilter === 'high') tasks = tasks.filter(t => t.priority === 'high');
+            return tasks;
+        }
+
+        const priorityColors = { high: 'bg-red-100 text-red-700', medium: 'bg-yellow-100 text-yellow-700', low: 'bg-green-100 text-green-700' };
+        const priorityLabels = { high: 'Tinggi', medium: 'Sedang', low: 'Rendah' };
+
+        function renderTasks() {
+            const list = document.getElementById('task-list');
+            const filtered = getFiltered();
+            list.innerHTML = '';
+            if (!filtered.length) {
+                list.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">Tidak ada tugas</p>';
+                return;
+            }
+            filtered.forEach(task => {
+                const div = document.createElement('div');
+                div.className = `slide-in flex items-start gap-3 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition ${task.completed ? 'opacity-60' : ''}`;
+                div.innerHTML = `
+                    <input type="checkbox" ${task.completed ? 'checked' : ''} class="mt-1 w-4 h-4 accent-blue-600 cursor-pointer" data-id="${task.__backendId}" onchange="toggleTask(this)">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium ${task.completed ? 'line-through text-gray-400' : 'text-gray-800'}">${escHtml(task.title)}</p>
+                        <div class="flex flex-wrap gap-1.5 mt-1">
+                            <span class="text-[10px] px-1.5 py-0.5 rounded ${priorityColors[task.priority] || priorityColors.medium}">${priorityLabels[task.priority] || 'Sedang'}</span>
+                            ${task.category ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-700">${escHtml(task.category)}</span>` : ''}
+                            ${task.deadline ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-600">${task.deadline}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex gap-1 shrink-0">
+                        <button onclick="startEdit('${task.__backendId}')" class="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition"><i data-lucide="edit" style="width:14px;height:14px"></i></button>
+                        <button onclick="deleteTask('${task.__backendId}')" class="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+        // Actions
+        async function toggleTask(el) {
+            const task = allTasks.find(t => t.__backendId === el.dataset.id);
+            if (!task) return;
+            task.completed = !task.completed;
+            const r = await window.dataSdk.update(task);
+            if (r.isOk) showToast(task.completed ? 'Tugas selesai!' : 'Tugas belum selesai', 'info');
+            else showToast('Gagal memperbarui', 'error');
+        }
+
+        async function deleteTask(id) {
+            const task = allTasks.find(t => t.__backendId === id);
+            if (!task) return;
+            const r = await window.dataSdk.delete(task);
+            if (r.isOk) showToast('Tugas dihapus', 'info');
+            else showToast('Gagal menghapus', 'error');
+        }
+
+        function startEdit(id) {
+            const task = allTasks.find(t => t.__backendId === id);
+            if (!task) return;
+            editingId = id;
+            document.getElementById('task-input').value = task.title;
+            document.getElementById('task-priority').value = task.priority || 'medium';
+            document.getElementById('task-deadline').value = task.deadline || '';
+            document.getElementById('task-category').value = task.category || '';
+        }
+
+        // Form
+        document.getElementById('task-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('task-input').value.trim();
+            if (!title) return;
+            const priority = document.getElementById('task-priority').value;
+            const deadline = document.getElementById('task-deadline').value;
+            const category = document.getElementById('task-category').value.trim();
+
+            if (editingId) {
+                const task = allTasks.find(t => t.__backendId === editingId);
+                if (task) {
+                    task.title = title; task.priority = priority; task.deadline = deadline; task.category = category;
+                    const r = await window.dataSdk.update(task);
+                    if (r.isOk) showToast('Tugas diperbarui');
+                    else showToast('Gagal memperbarui', 'error');
+                }
+                editingId = null;
+            } else {
+                if (allTasks.length >= 999) { showToast('Batas maksimum 999 tugas tercapai', 'error'); return; }
+                const r = await window.dataSdk.create({ title, completed: false, priority, deadline, category, created_at: new Date().toISOString() });
+                if (r.isOk) showToast('Tugas ditambahkan');
+                else showToast('Gagal menambahkan', 'error');
+            }
+            e.target.reset();
+        });
+
+        // Search & Filter
+        document.getElementById('search-input').addEventListener('input', (e) => { searchQuery = e.target.value; renderTasks(); });
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => { b.className = 'filter-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600'; });
+                btn.className = 'filter-btn active px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white';
+                currentFilter = btn.dataset.filter;
+                renderTasks();
+            });
+        });
+
+        // Delete All
+        document.getElementById('delete-all-btn').addEventListener('click', () => {
+            document.getElementById('delete-all-wrap').classList.add('hidden');
+            document.getElementById('delete-all-confirm').classList.remove('hidden');
+            document.getElementById('delete-all-confirm').classList.add('flex');
+        });
+        document.getElementById('confirm-no').addEventListener('click', () => {
+            document.getElementById('delete-all-confirm').classList.add('hidden');
+            document.getElementById('delete-all-wrap').classList.remove('hidden');
+        });
+        document.getElementById('confirm-yes').addEventListener('click', async () => {
+            for (const task of [...allTasks]) { await window.dataSdk.delete(task); }
+            showToast('Semua tugas dihapus', 'info');
+            document.getElementById('delete-all-confirm').classList.add('hidden');
+            document.getElementById('delete-all-wrap').classList.remove('hidden');
+        });
+
+        // Data SDK
+        const handler = {
+            onDataChanged(data) {
+                allTasks = data;
+                updateStats();
+                renderTasks();
+            }
+        };
+        (async () => {
+            const r = await window.dataSdk.init(handler);
+            if (!r.isOk) showToast('Gagal memuat data', 'error');
+        })();
+
+        lucide.createIcons();
+    </script>
+ </body>
+</html>
