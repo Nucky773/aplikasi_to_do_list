@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>To Do List</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+background:#f3f5f9;
+padding:30px;
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+background:#fff;
+padding:25px;
+border-radius:12px;
+box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+color:#333;
+}
+
+.top{
+display:flex;
+gap:10px;
+margin-bottom:20px;
+flex-wrap:wrap;
+}
+
+.top input{
+flex:1;
+padding:10px;
+border:1px solid #ccc;
+border-radius:8px;
+}
+
+.top button{
+padding:10px 20px;
+background:#3498db;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+.top button:hover{
+background:#2980b9;
+}
+
+.form{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+margin-bottom:20px;
+}
+
+.form input,
+.form textarea,
+.form select{
+padding:10px;
+border:1px solid #ccc;
+border-radius:8px;
+}
+
+textarea{
+resize:none;
+height:80px;
+grid-column:span 2;
+}
+
+.saveBtn{
+grid-column:span 2;
+padding:12px;
+background:#2ecc71;
+border:none;
+color:white;
+border-radius:8px;
+cursor:pointer;
+}
+
+.saveBtn:hover{
+background:#27ae60;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+table th{
+background:#3498db;
+color:white;
+padding:12px;
+}
+
+table td{
+padding:10px;
+border-bottom:1px solid #ddd;
+text-align:center;
+}
+
+.status{
+font-weight:bold;
+}
+
+.selesai{
+color:green;
+}
+
+.belum{
+color:red;
+}
+
+.action button{
+margin:2px;
+padding:6px 10px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+.edit{
+background:orange;
+color:white;
+}
+
+.delete{
+background:red;
+color:white;
+}
+
+.done{
+background:green;
+color:white;
+}
+
+@media(max-width:700px){
+
+.form{
+grid-template-columns:1fr;
+}
+
+textarea,
+.saveBtn{
+grid-column:span 1;
+}
+
+}
+#logoutBtn{
+    background:#e74c3c;
+    color:white;
+    border:none;
+    padding:10px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:.3s;
+}
+
+#logoutBtn:hover{
+    background:#c0392b;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>TO DO LIST</h1>
+<div style="display:flex;justify-content:flex-end;margin-bottom:15px;">
+    <button id="logoutBtn" onclick="logout()">
+        Logout
+    </button>
+</div>
+<div class="top">
+
+<input
+type="text"
+id="search"
+placeholder="Cari tugas..."
+>
+
+<button onclick="clearForm()">
+Reset
+</button>
+
+</div>
+
+<div class="form">
+
+<input
+type="text"
+id="title"
+placeholder="Judul Tugas"
+>
+
+<input
+type="date"
+id="date"
+>
+
+<textarea
+id="desc"
+placeholder="Deskripsi"
+></textarea>
+
+<select id="priority">
+
+<option>Normal</option>
+
+<option>Penting</option>
+
+<option>Mendesak</option>
+
+</select>
+
+<button
+class="saveBtn"
+onclick="saveTask()"
+id="saveBtn">
+Tambah Tugas
+</button>
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Judul</th>
+
+<th>Deskripsi</th>
+
+<th>Tanggal</th>
+
+<th>Prioritas</th>
+
+<th>Status</th>
+
+<th>Aksi</th>
+
+</tr>
+
+</thead>
+
+<tbody id="taskTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+<script>
+
+// ================================
+// CEK LOGIN
+// ================================
+
+if (localStorage.getItem("isLogin") !== "true") {
+    window.location.href = "index.html";
+}
+
+// ================================
+// USER LOGIN
+// ================================
+
+const currentUser = localStorage.getItem("email");
+
+const storageKey = "tasks_" + currentUser;
+
+// ================================
+// DATA
+// ================================
+
+let tasks = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+let editIndex = -1;
+
+// ================================
+// ELEMENT
+// ================================
+
+const table = document.getElementById("taskTable");
+const title = document.getElementById("title");
+const desc = document.getElementById("desc");
+const date = document.getElementById("date");
+const priority = document.getElementById("priority");
+const search = document.getElementById("search");
+const saveBtn = document.getElementById("saveBtn");
+
+// ================================
+// TAMPILKAN DATA
+// ================================
+
+function render() {
+
+    table.innerHTML = "";
+
+    tasks.forEach((task, index) => {
+
+        table.innerHTML += `
+
+        <tr>
+
+            <td>${task.title}</td>
+
+            <td>${task.desc}</td>
+
+            <td>${task.date}</td>
+
+            <td>${task.priority}</td>
+
+            <td class="status ${task.done ? 'selesai' : 'belum'}">
+
+                ${task.done ? 'Selesai' : 'Belum'}
+
+            </td>
+
+            <td class="action">
+
+                <button class="edit" onclick="editTask(${index})">
+                    Edit
+                </button>
+
+                <button class="delete" onclick="deleteTask(${index})">
+                    Hapus
+                </button>
+
+                <button class="done" onclick="doneTask(${index})">
+                    ✔
+                </button>
+
+            </td>
+
+        </tr>
+
+        `;
+
+    });
+
+    localStorage.setItem(storageKey, JSON.stringify(tasks));
+
+}
+
+render();
+
+// ================================
+// SIMPAN
+// ================================
+
+function saveTask() {
+
+    if (title.value.trim() == "") {
+
+        alert("Judul tugas wajib diisi.");
+
+        return;
+
+    }
+
+    const data = {
+
+        title: title.value,
+        desc: desc.value,
+        date: date.value,
+        priority: priority.value,
+        done: false
+
+    };
+
+    if (editIndex == -1) {
+
+        tasks.push(data);
+
+    } else {
+
+        data.done = tasks[editIndex].done;
+
+        tasks[editIndex] = data;
+
+        editIndex = -1;
+
+        saveBtn.innerHTML = "Tambah Tugas";
+
+    }
+
+    localStorage.setItem(storageKey, JSON.stringify(tasks));
+
+    render();
+
+    clearForm();
+
+}
+
+// ================================
+// EDIT
+// ================================
+
+function editTask(index) {
+
+    editIndex = index;
+
+    title.value = tasks[index].title;
+
+    desc.value = tasks[index].desc;
+
+    date.value = tasks[index].date;
+
+    priority.value = tasks[index].priority;
+
+    saveBtn.innerHTML = "Update Tugas";
+
+}
+
+// ================================
+// HAPUS
+// ================================
+
+function deleteTask(index) {
+
+    if (confirm("Yakin ingin menghapus tugas ini?")) {
+
+        tasks.splice(index, 1);
+
+        localStorage.setItem(storageKey, JSON.stringify(tasks));
+
+        render();
+
+    }
+
+}
+
+// ================================
+// SELESAI
+// ================================
+
+function doneTask(index) {
+
+    tasks[index].done = !tasks[index].done;
+
+    localStorage.setItem(storageKey, JSON.stringify(tasks));
+
+    render();
+
+}
+
+// ================================
+// RESET FORM
+// ================================
+
+function clearForm() {
+
+    title.value = "";
+
+    desc.value = "";
+
+    date.value = "";
+
+    priority.selectedIndex = 0;
+
+    editIndex = -1;
+
+    saveBtn.innerHTML = "Tambah Tugas";
+
+}
+
+// ================================
+// SEARCH
+// ================================
+
+search.addEventListener("keyup", function () {
+
+    const keyword = search.value.toLowerCase();
+
+    table.innerHTML = "";
+
+    tasks.forEach((task, index) => {
+
+        if (
+
+            task.title.toLowerCase().includes(keyword) ||
+
+            task.desc.toLowerCase().includes(keyword)
+
+        ) {
+
+            table.innerHTML += `
+
+            <tr>
+
+                <td>${task.title}</td>
+
+                <td>${task.desc}</td>
+
+                <td>${task.date}</td>
+
+                <td>${task.priority}</td>
+
+                <td class="status ${task.done ? 'selesai' : 'belum'}">
+
+                    ${task.done ? 'Selesai' : 'Belum'}
+
+                </td>
+
+                <td class="action">
+
+                    <button class="edit" onclick="editTask(${index})">
+                        Edit
+                    </button>
+
+                    <button class="delete" onclick="deleteTask(${index})">
+                        Hapus
+                    </button>
+
+                    <button class="done" onclick="doneTask(${index})">
+                        ✔
+                    </button>
+
+                </td>
+
+            </tr>
+
+            `;
+
+        }
+
+    });
+
+});
+
+// ================================
+// LOGOUT
+// ================================
+
+function logout() {
+
+    if (confirm("Yakin ingin logout?")) {
+
+        localStorage.removeItem("isLogin");
+        localStorage.removeItem("username");
+        localStorage.removeItem("email");
+
+        window.location.href = "index.html";
+
+    }
+
+}
+</script>
+
+</body>
+
+</html>

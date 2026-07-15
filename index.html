@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>To Do List App</title>
+
+    <!-- Font Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- ==========================
+             BAGIAN KIRI
+        =========================== -->
+        <div class="left-panel">
+
+            <div class="logo">
+                ✔
+            </div>
+
+            <h1>To Do List</h1>
+
+            <p>
+                Kelola aktivitas harianmu dengan mudah,
+                cepat, dan lebih produktif.
+            </p>
+
+        </div>
+
+        <!-- ==========================
+             BAGIAN KANAN
+        =========================== -->
+
+        <div class="right-panel">
+
+            <!-- LOGIN -->
+
+            <div class="form-box active" id="loginForm">
+
+                <h2>Selamat Datang 👋</h2>
+
+                <p class="subtitle">
+                    Silakan login untuk melanjutkan.
+                </p>
+
+                <form id="login">
+
+                    <div class="input-group">
+
+                        <label>Email</label>
+
+                        <input
+                            type="email"
+                            id="loginEmail"
+                            placeholder="Masukkan email"
+                            required>
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>Password</label>
+
+                        <div class="password-box">
+
+                            <input
+                                type="password"
+                                id="loginPassword"
+                                placeholder="Masukkan password"
+                                required>
+
+                            <span
+                                class="toggle-password"
+                                onclick="togglePassword('loginPassword', this)">
+                                👁
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="btn">
+                        Login
+                    </button>
+
+                </form>
+
+                <p class="switch-text">
+                    Belum punya akun?
+                    <span id="showRegister">
+                        Daftar Sekarang
+                    </span>
+                </p>
+
+            </div>
+
+            <!-- REGISTER -->
+
+            <div class="form-box" id="registerForm">
+
+                <h2>Buat Akun Baru</h2>
+
+                <p class="subtitle">
+                    Daftar untuk mulai menggunakan aplikasi.
+                </p>
+
+                <form id="register">
+
+                    <div class="input-group">
+
+                        <label>Username</label>
+
+                        <input
+                            type="text"
+                            id="username"
+                            placeholder="Masukkan username"
+                            required>
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>Email</label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            placeholder="Masukkan email"
+                            required>
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>Password</label>
+
+                        <div class="password-box">
+
+                            <input
+                                type="password"
+                                id="password"
+                                placeholder="Masukkan password"
+                                required>
+
+                            <span
+                                class="toggle-password"
+                                onclick="togglePassword('password', this)">
+                                👁
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>Konfirmasi Password</label>
+
+                        <div class="password-box">
+
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                placeholder="Ulangi password"
+                                required>
+
+                            <span
+                                class="toggle-password"
+                                onclick="togglePassword('confirmPassword', this)">
+                                👁
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="btn">
+                        Daftar
+                    </button>
+
+                </form>
+
+                <p class="switch-text">
+                    Sudah punya akun?
+                    <span id="showLogin">
+                        Login
+                    </span>
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/auth_index.js"></script>
+
+</body>
+</html>
